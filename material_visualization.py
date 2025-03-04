@@ -6,7 +6,7 @@ import sqlite3
 
 
 def fetch_data(table):
-    conn = sqlite3.connect("emissions.db")
+    conn = sqlite3.connect("data/emissions.db")
     cursor = conn.cursor()
     cursor.execute(f"SELECT * FROM {table}")
     data = cursor.fetchall()
@@ -24,20 +24,28 @@ def visual(table):
             df = pd.DataFrame(data, columns=["Id","Quantity", "Weight (kg)", "Emission (kg CO₂)"])
         elif table == "Kitems":
             df = pd.DataFrame(data, columns=["Id","Quantity", "Weight (kg)", "Emission (kg CO₂)", "Category"])
-        else:
+        elif table == "Trophies" or table == "Momentoes" or table == "Banners":
             df = pd.DataFrame(data, columns=["Id","Weight (kg)", "Emission (kg CO₂)"])
         st.table(df)
+
+        #Descriptive statistics
         st.subheader("Descriptive Analysis")
-        st.write(df.describe())
-                # Calculate insights
+        columns = df.columns.tolist()
+        col = st.selectbox("Select Columns", columns)
+        des = pd.DataFrame(df[col])
+        st.write(des.describe())
+               
+        # Calculate insights
         total_emission = df["Emission (kg CO₂)"].sum()
         avg_emission = df["Emission (kg CO₂)"].mean()
         max_emission = df["Emission (kg CO₂)"].max()
 
-                # Display insights
+        # Display insights
         st.write(f"**Total Emissions:** {total_emission:.2f} kg CO₂")
         st.write(f"**Average Emission per Trophy:** {avg_emission:.2f} kg CO₂")
         st.write(f"**Maximum Emission Recorded:** {max_emission:.2f} kg CO₂")
+
+        st.subheader("Emissions:")
 
         if table == "PetWaterBottle":
             cat = st.selectbox("select option:", ["Scatter", "Bar plot"])
@@ -106,3 +114,4 @@ def visual(table):
                 st.plotly_chart(fig, use_container_width=True)
     else:
         st.write("No records found.")
+
