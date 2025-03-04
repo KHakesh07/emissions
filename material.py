@@ -4,16 +4,7 @@ import sqlite3
 
 # Function to calculate emissions for trophies
 def calculate_trophies(weight):
-    steel_emission_factor = 2.54  # kg CO₂ per kg
-    plastic_emission_factor = 1.32  # kg CO₂ per kg
-
-    steel_weight = (3/5) * weight
-    plastic_weight = (2/5) * weight
-
-    steel_emission = steel_weight * steel_emission_factor
-    plastic_emission = plastic_weight * plastic_emission_factor
-
-    total_emission = steel_emission + plastic_emission
+    total_emission = ((3/5)*weight*2.54) + ((2/5)*weight*1.32)
     return total_emission
 
 # Function to calculate emissions for banners
@@ -25,52 +16,37 @@ def calculate_PetWB(Quantity):
 
 # Function to calculate emissions for momento
 def calculate_momento(weight):
-    polystyrene_emission_factor = 4.98  # kg CO₂ per kg
-    wood_emission_factor = 0.425  # kg CO₂ per kg
-
-    polystyrene_weight = (3/5) * weight
-    wood_weight = (2/5) * weight
-
-    polystyrene_emission = polystyrene_weight * polystyrene_emission_factor
-    wood_emission = wood_weight * wood_emission_factor
-
-    total_emission = polystyrene_emission + wood_emission
+    total_emission = ((3/5)*weight*4.98) + ((2/5)*weight*0.425)
     return total_emission
 
-def calculate_kit(Quantity, wight):
-    Recycled_paper_kit_emission_factor = 1.58     # kg CO₂ per kg
-    seed_papers_emission_factor = 0.005             # kg CO₂ per kg
-    pen_emission_factor = 2.28                    # kg CO₂ per kg
-    plant_emission_factor = 0                 # kg CO₂ per kg
-
-    total_kit_emission_factor = Recycled_paper_kit_emission_factor + seed_papers_emission_factor + pen_emission_factor + plant_emission_factor
-    total_kit_emission = Quantity * total_kit_emission_factor* wight
+def calculate_kit(Quantity, weight):
+    total_kit_emission = (1.58+0.005+2.28+0)*weight*Quantity
     return total_kit_emission
 
 
 def insert_into_db(table, weight, emission):
-    conn = sqlite3.connect('emissions.db')
+    conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
     c.execute(f"INSERT INTO {table} (weight, emission) VALUES (?, ?)", (weight, emission))
     conn.commit()
     conn.close()
 
 def insert_into_PWB(table, Quantity, emission):
-    conn = sqlite3.connect('emissions.db')
+    conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
     c.execute(f"INSERT INTO {table} (Quantity, emission) VALUES (?, ?)", (Quantity, emission))
     conn.commit()
     conn.close()
 
 def insert_into_kit(table, Quantity, Weight, emission):
-    conn = sqlite3.connect('emissions.db')
+    conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
     c.execute(f"INSERT INTO {table} (Quantity, Weight, Emission) VALUES (?, ?, ?)", (Quantity, Weight, emission))
     conn.commit()
     conn.close()
 
 def insert_into_kitems(table, Quantity, Weight, emission, category):
-    conn = sqlite3.connect('emissions.db')
+    conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
     c.execute(f"INSERT INTO {table} (Quantity, Weight, Emission, Category) VALUES (?, ?, ?, ?)", (Quantity, Weight, emission, category))
     conn.commit()
