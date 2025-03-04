@@ -87,6 +87,3 @@ def scope3():
         else:
             st.warning("Admin access required.")
     
-    if st.button("Back to Main Menu"):
-        st.session_state.page = "app"
-        st.rerun()
