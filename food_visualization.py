@@ -3,11 +3,11 @@ import sqlite3
 import pandas as pd
 import plotly.express as px
 
-def fetch_food_data():
+def fetch_food_data(table):
     try:
-        conn = sqlite3.connect("emissions.db")
+        conn = sqlite3.connect("data/emissions.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT FoodItem, Quantity, Emission FROM FoodEmissions")
+        cursor.execute(f"SELECT FoodItem, Quantity, Emission FROM {table}")
         data = cursor.fetchall()
         conn.close()
         return data
@@ -16,7 +16,8 @@ def fetch_food_data():
         return []
 
 def food_visual():
-    data = fetch_food_data()
+    table = st.selectbox("Select The table: ", ["FoodEmissions", "FoodItems"])
+    data = fetch_food_data(table)
     
     st.subheader("🍎 Food Emission Data")
 
@@ -26,6 +27,9 @@ def food_visual():
         
         st.subheader("Descriptive Analysis")
         st.write(df.describe())
+
+        st.subheader("Quantity of Food items:")
+        fig = st.line_chart(df, x="Quantity", y="FoodItem", color="FoodItem")
         
         # Calculate insights
         total_emission = df["Emission (kg CO₂)"].sum()
@@ -37,7 +41,8 @@ def food_visual():
         st.write(f"**Average Emission per Food Item:** {avg_emission:.2f} kg CO₂")
         st.write(f"**Maximum Emission Recorded:** {max_emission:.2f} kg CO₂")
 
-        cat = st.selectbox("Select option:", ["Scatter", "Bar plot"])
+        st.subheader("Emissions")
+        cat = st.selectbox("Select option:", ["Scatter", "Bar plot", "Line Graph"])
         
         if cat == "Scatter":
             fig = px.scatter(df, x="Quantity", y="Emission (kg CO₂)", title="Emission Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
@@ -49,5 +54,7 @@ def food_visual():
             fig.update_traces(texttemplate='%{text}', textposition='outside')
             fig.update_layout(xaxis=dict(tickmode="linear"), plot_bgcolor="white", font=dict(size=14))
             st.plotly_chart(fig, use_container_width=True)
+        elif cat == "Line Graph":
+            fig = st.line_chart(df, x="Emission (kg CO₂)", y="FoodItem", color="FoodItem")
     else:
         st.write("No food emission records found.")
