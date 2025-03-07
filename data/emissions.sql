@@ -112,3 +112,12 @@ IF NOT EXISTS FoodItems
     Quantity REAL NOT NULL,
     Emission REAL NOT NULL
 );
+
+CREATE TABLE
+IF NOT EXISTS Scope1
+(
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    FuelType TEXT NOT NULL,
+    Consumption REAL NOT NULL,
+    Emission REAL NOT NULL
+)

@@ -72,9 +72,6 @@ def show_food_calculator():
             insert_food_data(table, food_item, quantity, emission)
             st.success(f"Emission for {quantity} kg of {food_item}: {emission:.3f} kg CO₂")
 
-        if st.button("Back to Main Menu"):
-            st.session_state.page = "main"
-            st.rerun()
     
     with tab2:
         st.subheader("Dishes& Curries")

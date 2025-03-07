@@ -121,7 +121,3 @@ def show_material_calculator():
                 if st.button("Calculate & Save", key="pen"):
                     insert_into_kitems(table, Quantity, pen_weight, emission, catergoy)
                     st.success(f"Emission for {Quantity} Pen: {emission:.3f} kg CO₂")
-
-    if st.button("Back to main menu"):
-        st.session_state.page = "main"
-        st.rerun() # force the app to show the main menu
