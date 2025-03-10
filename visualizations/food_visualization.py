@@ -1,7 +1,9 @@
 import streamlit as st
 import sqlite3
 import pandas as pd
+import matplotlib.pyplot as plt
 import plotly.express as px
+from streamlit_extras.dataframe_explorer import dataframe_explorer
 
 def fetch_food_data(table):
     try:
@@ -23,29 +25,49 @@ def food_visual():
 
     if data:
         df = pd.DataFrame(data, columns=["FoodItem", "Quantity", "Emission (kg CO₂)"])
-        st.table(df)
+        dataframe = dataframe_explorer(df)
+        st.dataframe(dataframe, use_container_width=True)
         
         st.subheader("Descriptive Analysis")
-        st.write(df.describe())
-
-        st.subheader("Quantity of Food items:")
-        fig = st.line_chart(df, x="Quantity", y="FoodItem",  color="FoodItem")
-        
         # Calculate insights
-        total_emission = df["Emission (kg CO₂)"].sum()
-        avg_emission = df["Emission (kg CO₂)"].mean()
-        max_emission = df["Emission (kg CO₂)"].max()
+        total_emission = round(df["Emission (kg CO₂)"].sum(), 3)
+        avg_emission = round(df["Emission (kg CO₂)"].mean(), 3)
+        max_emission = round(df["Emission (kg CO₂)"].max(), 3)
+        min_emission = round(df["Emission (kg CO₂)"].min(), 3)
+        no_of_emissions = round(df["Emission (kg CO₂)"].count(), 3)
 
         # Display insights
-        st.write(f"**Total Emissions:** {total_emission:.2f} kg CO₂")
-        st.write(f"**Average Emission per Food Item:** {avg_emission:.2f} kg CO₂")
-        st.write(f"**Maximum Emission Recorded:** {max_emission:.2f} kg CO₂")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(label='Total Emission (kg CO₂)', value=total_emission, border=True)
+        with col2:
+            st.metric(label='Average Emission (kg CO₂)', value=avg_emission, border=True)
+        with col3:
+            st.metric(label='Highest Recorded Emission (kg CO₂)', value=max_emission, border=True)
+
+        col4, col5 = st.columns(2)
+        with col4:
+            st.metric(label='Lowest Recorded Emission (kg CO₂)', value=min_emission, border=True)
+        with col5:
+            st.metric(label='Number of Emissions Recorded', value=no_of_emissions, border=True)
+
+
+        st.subheader("Quantity of Food items:")
+        fig = px.scatter(df, x="Quantity", y="FoodItem",  color_continuous_scale="Blues", template="plotly_dark", size_max=15)
+        fig.update_traces(marker=dict(size=12, line=dict(width=1, color="black")), hovertemplate="<b>Quantity:</b> %{x}")
+        st.plotly_chart(fig, use_container_width=True)          
 
         st.subheader("Emissions")
-        cat = st.selectbox("Select option:", ["Scatter", "Bar plot", "Line Graph"])
+        cat = st.selectbox("Select option:", ["Pi chart","Scatter", "Bar plot", "Line Graph"])
         
-        if cat == "Scatter":
-            fig = px.scatter(df, x="Quantity", y="Emission (kg CO₂)", title="Emission Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
+        if cat == "Pi chart":
+            # pi chart
+            fig = px.pie(df, names='FoodItem', values="Emission (kg CO₂)", title="Emissions Breakdown", hole=0.3)
+            st.plotly_chart(fig, use_container_width=True)
+        
+        
+        elif cat == "Scatter":
+            fig = px.scatter(df, x="FoodItem", y="Emission (kg CO₂)", title="Emission Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
             fig.update_traces(marker=dict(size=12, line=dict(width=1, color="black")), hovertemplate="<b>Quantity:</b> %{x} kg<br><b>CO₂ Emission:</b> %{y} kg")
             st.plotly_chart(fig, use_container_width=True)
         
@@ -55,6 +77,7 @@ def food_visual():
             fig.update_layout(xaxis=dict(tickmode="linear"), plot_bgcolor="white", font=dict(size=14))
             st.plotly_chart(fig, use_container_width=True)
         elif cat == "Line Graph":
-            fig = st.line_chart(df, x="Emission (kg CO₂)", y="FoodItem", color="FoodItem",  )
+            fig = px.line(df,x="Emission (kg CO₂)", y="FoodItem", markers=True, title="Emission Trend by Food Item")
+            st.plotly_chart(fig, use_container_width=True)
     else:
         st.write("No food emission records found.")

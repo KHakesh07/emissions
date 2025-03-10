@@ -20,30 +20,41 @@ def visual(table):
     if data:
         if table == "PetWaterBottle":
             df =pd.DataFrame(data, columns=["Id","Quantity", "Emission (kg CO₂)"])
+            
         elif table == "Kit":
             df = pd.DataFrame(data, columns=["Id","Quantity", "Weight (kg)", "Emission (kg CO₂)"])
+
         elif table == "Kitems":
             df = pd.DataFrame(data, columns=["Id","Quantity", "Weight (kg)", "Emission (kg CO₂)", "Category"])
+
         elif table == "Trophies" or table == "Momentoes" or table == "Banners":
             df = pd.DataFrame(data, columns=["Id","Weight (kg)", "Emission (kg CO₂)"])
         st.table(df)
 
         #Descriptive statistics
         st.subheader("Descriptive Analysis")
-        columns = df.columns.tolist()
-        col = st.selectbox("Select Columns", columns)
-        des = pd.DataFrame(df[col])
-        st.write(des.describe())
-               
         # Calculate insights
-        total_emission = df["Emission (kg CO₂)"].sum()
-        avg_emission = df["Emission (kg CO₂)"].mean()
-        max_emission = df["Emission (kg CO₂)"].max()
+        total_emission = round(df["Emission (kg CO₂)"].sum(), 3)
+        avg_emission = round(df["Emission (kg CO₂)"].mean(), 3)
+        max_emission = round(df["Emission (kg CO₂)"].max(), 3)
+        min_emission = round(df["Emission (kg CO₂)"].min(), 3)
+        no_of_emissions = df["Emission (kg CO₂)"].count()
 
         # Display insights
-        st.write(f"**Total Emissions:** {total_emission:.2f} kg CO₂")
-        st.write(f"**Average Emission per Trophy:** {avg_emission:.2f} kg CO₂")
-        st.write(f"**Maximum Emission Recorded:** {max_emission:.2f} kg CO₂")
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            st.metric(label='Total Emission (kg CO₂)', value=total_emission, border=True)
+        with col2:
+            st.metric(label='Average Emission (kg CO₂)', value=avg_emission, border=True)
+        with col3:
+            st.metric(label='Highest Recorded Emission (kg CO₂)', value=max_emission, border=True)
+
+        col4, col5 = st.columns(2)
+        with col4:
+            st.metric(label='Lowest Recorded Emission (kg CO₂)', value=min_emission, border=True)
+        with col5:
+            st.metric(label='Number of Emissions Recorded', value=no_of_emissions, border=True)
+
 
         st.subheader("Emissions:")
 
@@ -102,6 +113,8 @@ def visual(table):
                 # Generate Matplotlib plot
         else:
             cat = st.selectbox("select option:", ["Scatter", "Bar plot"])
+            
+            
             if cat == "Scatter":
                 fig = px.scatter(df, x="Weight (kg)", y="Emission (kg CO₂)", title=" Emission Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
                 fig.update_traces(marker=dict(size=12, line=dict(width=1, color="black")),hovertemplate="<b>Weight:</b> %{x} kg<br><b>CO₂ Emission:</b> %{y} kg")
