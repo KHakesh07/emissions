@@ -62,10 +62,10 @@ def display():
 
     cat = st.selectbox("Select the plot for visualize the data:", ["Pi Chart", "Scatter", "Bar Plot"])
     if cat == "Pi Chart":
-          fig = px.pie(df, values=des, names='FuelType', title="Emissions Breakdown", hole=0.3)
+          fig = px.pie(df, values=des, names='FuelType', title=f"{des} Breakdown", hole=0.3)
           st.plotly_chart(fig, use_container_width=True)
     elif cat == "Scatter":
-            fig = px.scatter(df, x="FuelType", y=des, title="Emission Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
+            fig = px.scatter(df, x="FuelType", y=des, title=f"{des} Distribution", color='Emission (kg CO₂)', color_continuous_scale="Blues", template="plotly_dark", size_max=15)
             fig.update_traces(marker=dict(size=12, line=dict(width=1, color="black")))
             st.plotly_chart(fig, use_container_width=True)
         
