@@ -14,12 +14,14 @@ client = openrouteservice.Client(key=ORS_API_KEY)
 
 # Function to get coordinates using Nominatim (Free)
 def get_coordinates(place):
-    geolocator = Nominatim(user_agent="logistics_emission")  
-    location = geolocator.geocode(place, timeout=10)
-    if location:
-        return (location.latitude, location.longitude)
+    try:
+        response = client.pelias_search(place)
+        if response and 'features' in response and len(response['features']) > 0:
+            location = response['features'][0]['geometry']['coordinates']
+            return (location[1], location[0])
+    except Exception as e:
+        st.error(f"Geocoding error: {e}")
     return None
-
 # Function to calculate distance via OpenRouteService (for Truck)
 def calculate_distance_via_ors(origin, destination, profile):
     coords_origin = get_coordinates(origin)
