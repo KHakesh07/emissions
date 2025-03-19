@@ -11,7 +11,7 @@ ORS_API_KEY = '5b3ce3597851110001cf6248afd4bb63fe3a470bb0061a1ac1d8a410'  # Repl
 client = openrouteservice.Client(key=ORS_API_KEY)
 
 def get_coordinates(place):
-    geolocator = Nominatim(user_agent="logistics_emission")
+    geolocator = Nominatim(user_agent="logistics_emission", timeout=10)
     location = geolocator.geocode(place)
     if location:
         return (location.latitude, location.longitude)
