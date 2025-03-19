@@ -10,12 +10,6 @@ EMISSION_FACTORS = {
         "4W CNG": 0.068,
         "BUS": 0.015161
     },
-    "Track": {
-        "Local Train (Diesel)": 2.651
-    },
-    "Airways": {
-        "Plane (Domestic)": 1.58
-    }
 }
 
 # ⚡ Electric Consumption (kWh per km)
@@ -46,7 +40,7 @@ def insert_transport_data(mode, vehicle, distance, emission):
 def show_transport_calculator():
     st.subheader("🚛 Transport Emission Calculator")
 
-    mode = st.selectbox("Select Mode of Transport", ["Road", "Track", "Airways"])
+    mode = "Road"
 
     # Separate fuel-based and electric vehicles
     fuel_vehicles = list(EMISSION_FACTORS.get(mode, {}).keys())
