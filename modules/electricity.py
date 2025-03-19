@@ -4,7 +4,11 @@ import sqlite3
 # ⚡ Electricity Consumption Emission Factors (kg CO₂ per kWh)
 ELECTRICITY_EMISSION_FACTORS = {
     "Lighting and other electrical uses": 1.238,  
-    "Cooling": 0.709
+    "Cooling": 0.709,
+    "Nuclear": 0.012,
+    "Solar": 0.041,
+    "Wind": 0.011,
+    "Hydroelectric": 0.024,
 }
 
 # ❄ HVAC Refrigerant Emission Factors
@@ -44,20 +48,20 @@ def calculate_hvac_emission(refrigerant, mass_leak):
     return 0
 
 # 📌 Insert Electricity Data into DB
-def insert_electricity_data(category, value, emission):
+def insert_electricity_data(event, category, value, emission):
     conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
-    c.execute("INSERT INTO ElectricityEmissions (Usage, Value, Emission) VALUES (?, ?, ?)", (category, value, emission))
+    c.execute("INSERT INTO ElectricityEmissions (event, Usage, Value, Emission) VALUES (?, ?, ?, ?)", (event, category, value, emission))
     conn.commit()
     conn.close()
 
 # 📌 Insert HVAC Data into DB
-def insert_hvac_data(refrigerant, mass_leak, emission):
+def insert_hvac_data(event, refrigerant, mass_leak, emission):
     conn = sqlite3.connect('data/emissions.db')
     c = conn.cursor()
     c.execute(
-        "INSERT INTO HVACEmissions (Refrigerant, MassLeak, Emission) VALUES (?, ?, ?)", 
-        (refrigerant, mass_leak, emission)
+        "INSERT INTO HVACEmissions (event, Refrigerant, MassLeak, Emission) VALUES (?, ?, ?, ?)", 
+        (event, refrigerant, mass_leak, emission)
     )
     conn.commit()
     conn.close()
@@ -72,23 +76,27 @@ def show_electricity_hvac_calculator():
     with tab1:
         # 🔋 Electricity Consumption Section
         st.write("### 🔋 Electricity Consumption")
+        event = st.text_input("Event Name", placeholder="Enter event name", key="Quack")
+
         category = st.selectbox("Select Energy Use Category", list(ELECTRICITY_EMISSION_FACTORS.keys()))
         value = st.number_input(f"Enter Consumption for {category} (kWh):", min_value=0.0, step=0.1, value=0.0)
 
         if st.button("Calculate Electricity Emission", key="electricity_calc_button"):
             emission = calculate_electricity_emission(category, value)
-            insert_electricity_data(category, value, emission)
+            insert_electricity_data(event, category, value, emission)
             st.success(f"Emission from {value} kWh in {category}: {emission:.3f} kg CO₂")
 
     with tab2:
         # ❄ HVAC Refrigerant Leakage Section
         st.write("### ❄ HVAC Refrigerant Leakage")
+        event = st.text_input("Event Name", placeholder="Enter event name", key="duck")
+
         refrigerant = st.selectbox("Select Refrigerant", list(HVAC_REFRIGERANTS.keys()))
         mass_leak = st.number_input(f"Enter Mass Leak for {refrigerant} (kg):", min_value=0.0, step=0.01, value=0.0)
 
         if st.button("Calculate HVAC Emission", key="hvac_calc_button"):
             emission = calculate_hvac_emission(refrigerant, mass_leak)
-            insert_hvac_data(refrigerant, mass_leak, emission)
+            insert_hvac_data(event, refrigerant, mass_leak, emission)
             st.success(f"Emission from {mass_leak} kg leakage of {refrigerant}: {emission:.3f} kg CO₂eq")
 
             # Suggest Greener Alternatives

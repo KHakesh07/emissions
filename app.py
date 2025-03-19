@@ -1,4 +1,14 @@
+# Set page configuration as the very first Streamlit command.
 import streamlit as st
+st.set_page_config(
+    page_title="Emission Calculator and Analysis Dashboard",
+    page_icon="🌍",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
+
+
+import time
 from streamlit_option_menu import option_menu
 
 from app_pages.scope3 import scope3_page
@@ -6,13 +16,8 @@ from app_pages.scope2 import scope2_page
 from app_pages.scope1 import scope1_page
 from app_pages.overview import overview_page
 from app_pages.Login import simple_login
-# Set page configuration as the very first Streamlit command.
-st.set_page_config(
-    page_title="Emission Calculator and Analysis Dashboard",
-    page_icon="🌍",
-    layout="wide",
-    initial_sidebar_state="expanded"
-)
+from visualizations.OverallAnalysis import vis
+
 
 #----------------------#
 # Data base initiation #
@@ -59,7 +64,7 @@ call()
 selected = option_menu(
     menu_title="Emissions Calculators",
     menu_icon="cloud",
-    options=["Overview", "Scope 1", "Scope 2", "Scope 3"],
+    options=["Overview", "Scope 1", "Scope 2", "Scope 3", "Analysis"],
     orientation="horizontal",
 )
 
@@ -73,3 +78,5 @@ elif selected == "Scope 2":
     scope2_page()
 elif selected == "Scope 3":
     scope3_page()
+elif selected == "Analysis":
+    vis()
