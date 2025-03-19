@@ -4,3 +4,4 @@ matplotlib
 plotly.express
 streamlit-option-menu
 streamlit-extras
+geopy
